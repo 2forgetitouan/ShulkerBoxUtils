@@ -98,14 +98,17 @@ public class ShulkerInventoryMixin {
         // --- Fill indicator bar ---
         // Inverted durability convention: green = empty (like new tool), red = full (like broken tool)
         if (fillEnabled) {
+            // Bar grows as the box fills up; color shifts toward red the fuller it gets.
             float fillFraction = filledSlots / 27.0f;
-            float displayFraction = 1.0f - fillFraction;
-            int barWidth = Math.max(1, Math.round(13.0f * displayFraction));
-            int rgb = Mth.hsvToRgb(displayFraction / 3.0f, 1.0f, 1.0f);
+            // float displayFraction = 1.0f - fillFraction;
+            // Full box (27/27) -> bar fully extended (true maximum).
+            // Any box with at least one free slot -> bar capped just below max,
+            // so it's always visually distinguishable from a completely full box.
+            int barWidth = (filledSlots >= 27) ? 13 : Math.min(12, Math.round(13.0f * fillFraction));
+            int rgb = Mth.hsvToRgb((1.0f - fillFraction) / 3.0f, 1.0f, 1.0f);
             // 2px black background (matches vanilla durability bar layout)
             self.fill(x + 2, y + 13, x + 15, y + 15, 0xFF000000);
             // Colored fill bar on top row; bottom row stays black as shadow (same as vanilla)
-            self.fill(x + 2, y + 13, x + 2 + barWidth, y + 14, 0xFF000000 | rgb);
-        }
+            self.fill(x + 2, y + 13, x + 2 + barWidth, y + 14, 0xFF000000 | rgb);        }
     }
 }
